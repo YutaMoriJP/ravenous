@@ -1,6 +1,3 @@
-//CLIENT ID:
-//FnJ2_Ojp8G3-V-jIdYMtAg
-
 const apiKey =
   'P_nD_BMNnP-VAQ4_yk8g-NN9yqerxJxCioPI2Z8BI6EtjjR3vi6QWJ4uf-o2nzOzT53Qv4cplia_BwucB1P6Gf4F_-UZHB2lqzq_wNNYDA1s9ONbZcP8N9QzGLyEX3Yx';
 
