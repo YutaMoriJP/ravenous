@@ -28419,13 +28419,14 @@ var Business = /*#__PURE__*/function (_React$Component) {
           rating = _this$props$business.rating,
           reviewCount = _this$props$business.reviewCount,
           state = _this$props$business.state,
-          zipCode = _this$props$business.zipCode;
+          zipCode = _this$props$business.zipCode,
+          imageSrc = _this$props$business.imageSrc;
       return /*#__PURE__*/_react.default.createElement("div", {
         className: "Business"
       }, /*#__PURE__*/_react.default.createElement("div", {
         className: "image-container"
       }, /*#__PURE__*/_react.default.createElement("img", {
-        src: _pizza.default,
+        src: imageSrc,
         alt: "pizza"
       })), /*#__PURE__*/_react.default.createElement("h2", null, name), /*#__PURE__*/_react.default.createElement("div", {
         className: "Business-Informaiton"
@@ -28507,7 +28508,7 @@ var BusinessList = /*#__PURE__*/function (_React$Component) {
       }, businesses.map(function (business) {
         return /*#__PURE__*/_react.default.createElement(_Business.default, {
           business: business,
-          name: "Yuta"
+          key: business.id
         });
       }));
     }
@@ -28559,32 +28560,89 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-var sortByOptions = {
-  'Best Match': 'best_match',
-  'Highest Rated': 'rating',
-  'Most Reviewed': 'review_count'
-};
-
 var SearchBar = /*#__PURE__*/function (_React$Component) {
   _inherits(SearchBar, _React$Component);
 
   var _super = _createSuper(SearchBar);
 
-  function SearchBar() {
+  function SearchBar(props) {
+    var _this;
+
     _classCallCheck(this, SearchBar);
 
-    return _super.apply(this, arguments);
+    _this = _super.call(this, props);
+    _this.state = {
+      term: '',
+      location: '',
+      sortBy: 'best_match'
+    };
+    _this.handleTermChange = _this.handleTermChange.bind(_assertThisInitialized(_this));
+    _this.handleLocationChange = _this.handleLocationChange.bind(_assertThisInitialized(_this));
+    _this.handleSearch = _this.handleSearch.bind(_assertThisInitialized(_this));
+    _this.sortByOptions = {
+      'Best Match': 'best_match',
+      'Highest Rated': 'rating',
+      'Most Reviewed': 'review_count'
+    };
+    return _this;
   }
 
   _createClass(SearchBar, [{
+    key: "getSortByClass",
+    value: function getSortByClass(sortByOption) {
+      var sortBy = this.state.sortBy;
+
+      if (sortBy === sortByOption) {
+        return 'active';
+      }
+
+      return '';
+    }
+  }, {
+    key: "handleSortByChange",
+    value: function handleSortByChange(sortByOption) {
+      this.setState({
+        sortBy: sortByOption
+      });
+    }
+  }, {
+    key: "handleTermChange",
+    value: function handleTermChange(e) {
+      this.setState({
+        term: e.target.value
+      });
+    }
+  }, {
+    key: "handleLocationChange",
+    value: function handleLocationChange(e) {
+      this.setState({
+        location: e.target.value
+      });
+    }
+  }, {
     key: "renderSortByOptions",
     value: function renderSortByOptions() {
-      return Object.keys(sortByOptions).map(function (sortByOption) {
-        var sortByOptionValue = sortByOptions[sortByOption];
+      var _this2 = this;
+
+      return Object.keys(this.sortByOptions).map(function (sortByOption, index) {
+        var sortByOptionValue = Object.values(_this2.sortByOptions)[index];
         return /*#__PURE__*/_react.default.createElement("li", {
-          key: sortByOptionValue
+          key: sortByOptionValue,
+          className: _this2.getSortByClass(sortByOptionValue),
+          onClick: _this2.handleSortByChange.bind(_this2, sortByOptionValue)
         }, sortByOption);
       });
+    }
+  }, {
+    key: "handleSearch",
+    value: function handleSearch(e) {
+      var searchYelp = this.props.searchYelp;
+      var _this$state = this.state,
+          term = _this$state.term,
+          location = _this$state.location,
+          sortBy = _this$state.sortBy;
+      searchYelp(term, location, sortBy);
+      e.preventDefault();
     }
   }, {
     key: "render",
@@ -28596,12 +28654,16 @@ var SearchBar = /*#__PURE__*/function (_React$Component) {
       }, /*#__PURE__*/_react.default.createElement("ul", null, this.renderSortByOptions())), /*#__PURE__*/_react.default.createElement("div", {
         className: "SearchBar-fields"
       }, /*#__PURE__*/_react.default.createElement("input", {
-        placeholder: "Search Businesses"
+        placeholder: "Search Businesses",
+        onChange: this.handleTermChange
       }), /*#__PURE__*/_react.default.createElement("input", {
-        placeholder: "Where?"
+        placeholder: "Where?",
+        onChange: this.handleLocationChange
       })), /*#__PURE__*/_react.default.createElement("div", {
         className: "SearchBar-submit"
-      }, /*#__PURE__*/_react.default.createElement("a", null, "Let's Go")));
+      }, /*#__PURE__*/_react.default.createElement("a", {
+        onClick: this.handleSearch
+      }, "Let's Go")));
     }
   }]);
 
@@ -28610,7 +28672,47 @@ var SearchBar = /*#__PURE__*/function (_React$Component) {
 
 var _default = SearchBar;
 exports.default = _default;
-},{"react":"../node_modules/react/index.js","./SearchBar.css":"../components/SearchBar/SearchBar.css"}],"../components/App/App.css":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","./SearchBar.css":"../components/SearchBar/SearchBar.css"}],"../util/Yelp.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+//CLIENT ID:
+//FnJ2_Ojp8G3-V-jIdYMtAg
+var apiKey = 'P_nD_BMNnP-VAQ4_yk8g-NN9yqerxJxCioPI2Z8BI6EtjjR3vi6QWJ4uf-o2nzOzT53Qv4cplia_BwucB1P6Gf4F_-UZHB2lqzq_wNNYDA1s9ONbZcP8N9QzGLyEX3Yx';
+var Yelp = {
+  search: function search(term, location, sortBy) {
+    return fetch("https://cors-anywhere.herokuapp.com/https://api.yelp.com/v3/businesses/search?term=".concat(term, "&location=").concat(location, "&sort_by=").concat(sortBy), {
+      headers: {
+        Authorization: "Bearer ".concat(apiKey)
+      }
+    }).then(function (response) {
+      return response.json();
+    }).then(function (jsonReponse) {
+      if (Object.keys(jsonReponse).includes('businesses')) {
+        return jsonReponse.businesses.map(function (business) {
+          return {
+            id: business.id,
+            imageSrc: business.image_url,
+            name: business.name,
+            address: business.location.address1,
+            city: business.location.city,
+            state: business.location.state,
+            zipCode: business.location.zip_code,
+            category: business.categories[0].alias,
+            rating: business.rating,
+            reviewCount: business.review_count
+          };
+        });
+      }
+    });
+  }
+};
+var _default = Yelp;
+exports.default = _default;
+},{}],"../components/App/App.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
@@ -28627,9 +28729,9 @@ var _BusinessList = _interopRequireDefault(require("../Business/BusinessList"));
 
 var _SearchBar = _interopRequireDefault(require("../SearchBar/SearchBar"));
 
-var _react = _interopRequireDefault(require("react"));
+var _Yelp = _interopRequireDefault(require("../../util/Yelp"));
 
-var _pizza = _interopRequireDefault(require("../../src/img/pizza.png"));
+var _react = _interopRequireDefault(require("react"));
 
 require("./App.css");
 
@@ -28657,37 +28759,44 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-var randomNum = Math.floor(Math.random() * 100);
-var business = {
-  image: _pizza.default,
-  name: 'Home made Pizza',
-  city: 'Victoria',
-  address: 'Douglas Street North',
-  state: 'BC',
-  zipCode: 'V0415',
-  category: 'Italian',
-  rating: '4.1',
-  reviewCount: randomNum
-};
-var businesses = [business, business, business, business, business, business];
-
 var App = /*#__PURE__*/function (_React$Component) {
   _inherits(App, _React$Component);
 
   var _super = _createSuper(App);
 
-  function App() {
+  function App(props) {
+    var _this;
+
     _classCallCheck(this, App);
 
-    return _super.apply(this, arguments);
+    _this = _super.call(this, props);
+    _this.state = {
+      businesses: []
+    };
+    _this.searchYelp = _this.searchYelp.bind(_assertThisInitialized(_this));
+    return _this;
   }
 
   _createClass(App, [{
+    key: "searchYelp",
+    value: function searchYelp(term, location, sortBy) {
+      var _this2 = this;
+
+      _Yelp.default.search(term, location, sortBy).then(function (businesses) {
+        return _this2.setState({
+          businesses: businesses
+        });
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
+      var businesses = this.state.businesses;
       return /*#__PURE__*/_react.default.createElement("div", {
         className: "App"
-      }, /*#__PURE__*/_react.default.createElement("h1", null, "Ravenous"), /*#__PURE__*/_react.default.createElement(_SearchBar.default, null), /*#__PURE__*/_react.default.createElement(_BusinessList.default, {
+      }, /*#__PURE__*/_react.default.createElement("h1", null, "Ravenous"), /*#__PURE__*/_react.default.createElement(_SearchBar.default, {
+        searchYelp: this.searchYelp
+      }), /*#__PURE__*/_react.default.createElement(_BusinessList.default, {
         businesses: businesses
       }));
     }
@@ -28698,7 +28807,7 @@ var App = /*#__PURE__*/function (_React$Component) {
 
 var _default = App;
 exports.default = _default;
-},{"../Business/BusinessList":"../components/Business/BusinessList.js","../SearchBar/SearchBar":"../components/SearchBar/SearchBar.js","react":"../node_modules/react/index.js","../../src/img/pizza.png":"img/pizza.png","./App.css":"../components/App/App.css"}],"index.js":[function(require,module,exports) {
+},{"../Business/BusinessList":"../components/Business/BusinessList.js","../SearchBar/SearchBar":"../components/SearchBar/SearchBar.js","../../util/Yelp":"../util/Yelp.js","react":"../node_modules/react/index.js","./App.css":"../components/App/App.css"}],"index.js":[function(require,module,exports) {
 "use strict";
 
 var _react = _interopRequireDefault(require("react"));
@@ -28740,7 +28849,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61006" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56689" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -1,5 +1,4 @@
 import React from 'react';
-import pizza from '../../src/img/pizza.png';
 import './Business.css';
 
 class Business extends React.Component {
@@ -14,12 +13,13 @@ class Business extends React.Component {
         reviewCount,
         state,
         zipCode,
+        imageSrc,
       },
     } = this.props;
     return (
       <div className="Business">
         <div className="image-container">
-          <img src={pizza} alt="pizza"></img>
+          <img src={imageSrc} alt="pizza"></img>
         </div>
         <h2>{name}</h2>
         <div className="Business-Informaiton">
